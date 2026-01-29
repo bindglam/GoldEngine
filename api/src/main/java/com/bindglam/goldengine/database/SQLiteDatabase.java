@@ -1,8 +1,6 @@
 package com.bindglam.goldengine.database;
 
-import com.bindglam.goldengine.GoldEngine;
 import com.bindglam.goldengine.GoldEngineConfiguration;
-import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +47,7 @@ public class SQLiteDatabase implements Database {
     private void connect() {
         try {
             connection = DriverManager.getConnection("jdbc:sqlite:plugins/GoldEngine/database.db");
+            connection.setAutoCommit(config.database.sqlite.autoCommit.value());
         } catch (SQLException e) {
             throw new RuntimeException("Failed to connect to database", e);
         }
@@ -65,10 +64,23 @@ public class SQLiteDatabase implements Database {
         }
     }
 
+    private Connection ensureConnection() {
+        try {
+            if(this.connection == null || this.connection.isValid(config.database.sqlite.validTimeout.value())) {
+                this.disconnect();
+                this.connect();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to ensure connection to database", e);
+        }
+
+        return this.connection;
+    }
+
     @Override
     public void getConnection(ConnectionConsumer consumer) {
         try {
-            consumer.accept(connection);
+            consumer.accept(ensureConnection());
         } catch (SQLException e) {
             throw new RuntimeException("Failed to proceed database connection", e);
         }
