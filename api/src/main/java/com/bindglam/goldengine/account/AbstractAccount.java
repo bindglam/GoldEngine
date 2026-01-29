@@ -79,20 +79,11 @@ public abstract class AbstractAccount implements Account {
 
     @Override
     public boolean modifyBalance(BigDecimal amount, Operation operation) {
-        return switch(operation) {
-            case ADD -> {
-                this.balance = this.balance.add(amount);
-                yield true;
-            }
-
-            case SUBTRACT -> {
-                if(this.balance.compareTo(amount) < 0)
-                    yield false;
-
-                this.balance = this.balance.subtract(amount);
-                yield true;
-            }
-        };
+        Operation.Result result = operation.operate(this.balance, amount);
+        if(result.isFailed())
+            return false;
+        this.balance = result.result();
+        return true;
     }
 
     @Override
