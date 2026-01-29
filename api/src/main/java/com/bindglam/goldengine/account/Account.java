@@ -9,5 +9,7 @@ public interface Account extends AutoCloseable {
 
     double balance();
 
-    void balance(double amount);
+    void balance(double balance);
+
+    boolean modifyBalance(double amount, Operation operation);
 }

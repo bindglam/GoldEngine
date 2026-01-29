@@ -1,6 +1,7 @@
 package com.bindglam.goldengine.manager
 
 import com.bindglam.goldengine.GoldEngine
+import com.bindglam.goldengine.account.Operation
 import com.bindglam.goldengine.utils.plugin
 import dev.jorel.commandapi.CommandAPI
 import dev.jorel.commandapi.CommandAPIBukkitConfig
@@ -31,6 +32,18 @@ object CommandManager : Managerial {
                                     account.close()
                                 }
                             }),
+                        CommandAPICommand("set")
+                            .withArguments(OfflinePlayerArgument("target"), DoubleArgument("amount"))
+                            .executes(CommandExecutor { sender, args ->
+                                val target = args["target"] as OfflinePlayer
+                                val amount = args["amount"] as Double
+
+                                AccountManagerImpl.getAccount(target.uniqueId).thenAccept { account ->
+                                    account.balance(amount)
+                                    sender.sendMessage(Component.text(account.balance()))
+                                    account.close()
+                                }
+                            }),
                         CommandAPICommand("add")
                             .withArguments(OfflinePlayerArgument("target"), DoubleArgument("amount"))
                             .executes(CommandExecutor { sender, args ->
@@ -38,7 +51,19 @@ object CommandManager : Managerial {
                                 val amount = args["amount"] as Double
 
                                 AccountManagerImpl.getAccount(target.uniqueId).thenAccept { account ->
-                                    account.balance(account.balance() + amount)
+                                    account.modifyBalance(amount, Operation.ADD)
+                                    sender.sendMessage(Component.text(account.balance()))
+                                    account.close()
+                                }
+                            }),
+                        CommandAPICommand("subtract")
+                            .withArguments(OfflinePlayerArgument("target"), DoubleArgument("amount"))
+                            .executes(CommandExecutor { sender, args ->
+                                val target = args["target"] as OfflinePlayer
+                                val amount = args["amount"] as Double
+
+                                AccountManagerImpl.getAccount(target.uniqueId).thenAccept { account ->
+                                    account.modifyBalance(amount, Operation.SUBTRACT)
                                     sender.sendMessage(Component.text(account.balance()))
                                     account.close()
                                 }

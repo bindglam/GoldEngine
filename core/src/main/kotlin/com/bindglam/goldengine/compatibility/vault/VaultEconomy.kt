@@ -1,13 +1,13 @@
 package com.bindglam.goldengine.compatibility.vault
 
 import com.bindglam.goldengine.GoldEngine
+import com.bindglam.goldengine.account.Operation
 import com.bindglam.goldengine.manager.AccountManagerImpl
 import net.milkbowl.vault.economy.AbstractEconomy
 import net.milkbowl.vault.economy.EconomyResponse
 import org.bukkit.Bukkit
 import java.text.DecimalFormat
 import kotlin.math.floor
-import kotlin.math.max
 
 object VaultEconomy : AbstractEconomy() {
     private val decimalFormat = DecimalFormat("###,###")
@@ -48,8 +48,10 @@ object VaultEconomy : AbstractEconomy() {
         val player = Bukkit.getOfflinePlayer(playerName)
 
         AccountManagerImpl.getAccount(player.uniqueId).get().use { account ->
-            account.balance(max(account.balance() - amount, 0.0))
-            return EconomyResponse(amount, account.balance(), EconomyResponse.ResponseType.SUCCESS, null)
+            return if(account.modifyBalance(amount, Operation.SUBTRACT))
+                EconomyResponse(amount, account.balance(), EconomyResponse.ResponseType.SUCCESS, null)
+            else
+                EconomyResponse(amount, account.balance(), EconomyResponse.ResponseType.FAILURE, null)
         }
     }
 
@@ -59,8 +61,10 @@ object VaultEconomy : AbstractEconomy() {
         val player = Bukkit.getOfflinePlayer(playerName)
 
         AccountManagerImpl.getAccount(player.uniqueId).get().use { account ->
-            account.balance(account.balance() + amount)
-            return EconomyResponse(amount, account.balance(), EconomyResponse.ResponseType.SUCCESS, null)
+            return if(account.modifyBalance(amount, Operation.ADD))
+                EconomyResponse(amount, account.balance(), EconomyResponse.ResponseType.SUCCESS, null)
+            else
+                EconomyResponse(amount, account.balance(), EconomyResponse.ResponseType.FAILURE, null)
         }
     }
 

@@ -72,8 +72,26 @@ public abstract class AbstractAccount implements Account {
     }
 
     @Override
-    public void balance(double amount) {
-        this.balance = amount;
+    public void balance(double balance) {
+        this.balance = balance;
+    }
+
+    @Override
+    public boolean modifyBalance(double amount, Operation operation) {
+        return switch(operation) {
+            case ADD -> {
+                this.balance += amount;
+                yield true;
+            }
+
+            case SUBTRACT -> {
+                if(this.balance < amount)
+                    yield false;
+
+                this.balance -= amount;
+                yield true;
+            }
+        };
     }
 
     @Override
