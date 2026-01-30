@@ -1,0 +1,2 @@
+command_money: "<yellow>현재 잔액: %s"
+command_money_balance_get: "<yellow>%s님의 현재 잔액: %s"

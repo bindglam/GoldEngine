@@ -8,6 +8,8 @@ import com.bindglam.goldengine.database.DatabaseType;
 import java.io.File;
 
 public final class GoldEngineConfiguration extends Configuration {
+    public final Field<String> language = createPrimitiveField("language", "korean");
+
     public final Database database = new Database();
     public final class Database {
         public final Field<DatabaseType> type = createExtendedComplexField(() -> new EnumField<>("database.type", DatabaseType.SQLITE, DatabaseType.class));

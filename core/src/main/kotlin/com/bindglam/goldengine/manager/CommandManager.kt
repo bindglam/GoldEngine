@@ -2,6 +2,7 @@ package com.bindglam.goldengine.manager
 
 import com.bindglam.goldengine.GoldEngine
 import com.bindglam.goldengine.account.Operation
+import com.bindglam.goldengine.utils.lang
 import com.bindglam.goldengine.utils.plugin
 import dev.jorel.commandapi.CommandAPI
 import dev.jorel.commandapi.CommandAPIBukkitConfig
@@ -37,8 +38,7 @@ object CommandManager : Managerial {
                                 val target = args["target"] as OfflinePlayer
 
                                 AccountManagerImpl.getAccount(target.uniqueId).thenAccept { account ->
-                                    sender.sendMessage(Component.text("Current balance : ${decimalFormat.format(account.balance())}${GoldEngine.instance().config().economy.currencyName.value()}")
-                                        .color(NamedTextColor.YELLOW))
+                                    sender.sendMessage(lang("command_money_balance_get", target.name ?: "Unknown", "${decimalFormat.format(account.balance())}${GoldEngine.instance().config().economy.currencyName.value()}"))
                                     account.close()
                                 }
                             }),
@@ -51,8 +51,7 @@ object CommandManager : Managerial {
 
                                 AccountManagerImpl.getAccount(target.uniqueId).thenAccept { account ->
                                     account.balance(BigDecimal.valueOf(amount))
-                                    sender.sendMessage(Component.text("Current balance : ${decimalFormat.format(account.balance())}${GoldEngine.instance().config().economy.currencyName.value()}")
-                                        .color(NamedTextColor.YELLOW))
+                                    sender.sendMessage(lang("command_money_balance_get", target.name ?: "Unknown", "${decimalFormat.format(account.balance())}${GoldEngine.instance().config().economy.currencyName.value()}"))
                                     account.close()
                                 }
                             }),
@@ -65,8 +64,7 @@ object CommandManager : Managerial {
 
                                 AccountManagerImpl.getAccount(target.uniqueId).thenAccept { account ->
                                     account.modifyBalance(BigDecimal.valueOf(amount), Operation.ADD)
-                                    sender.sendMessage(Component.text("Current balance : ${decimalFormat.format(account.balance())}${GoldEngine.instance().config().economy.currencyName.value()}")
-                                        .color(NamedTextColor.YELLOW))
+                                    sender.sendMessage(lang("command_money_balance_get", target.name ?: "Unknown", "${decimalFormat.format(account.balance())}${GoldEngine.instance().config().economy.currencyName.value()}"))
                                     account.close()
                                 }
                             }),
@@ -79,8 +77,7 @@ object CommandManager : Managerial {
 
                                 AccountManagerImpl.getAccount(target.uniqueId).thenAccept { account ->
                                     account.modifyBalance(BigDecimal.valueOf(amount), Operation.SUBTRACT)
-                                    sender.sendMessage(Component.text("Current balance : ${decimalFormat.format(account.balance())}${GoldEngine.instance().config().economy.currencyName.value()}")
-                                        .color(NamedTextColor.YELLOW))
+                                    sender.sendMessage(lang("command_money_balance_get", target.name ?: "Unknown", "${decimalFormat.format(account.balance())}${GoldEngine.instance().config().economy.currencyName.value()}"))
                                     account.close()
                                 }
                             })
@@ -88,8 +85,7 @@ object CommandManager : Managerial {
             )
             .executesPlayer(PlayerCommandExecutor { player, _ ->
                 AccountManagerImpl.getAccount(player.uniqueId).thenAccept { account ->
-                    player.sendMessage(Component.text("Current balance : ${decimalFormat.format(account.balance())}${GoldEngine.instance().config().economy.currencyName.value()}")
-                        .color(NamedTextColor.YELLOW))
+                    player.sendMessage(lang("command_money", "${decimalFormat.format(account.balance())}${GoldEngine.instance().config().economy.currencyName.value()}"))
                     account.close()
                 }
             })

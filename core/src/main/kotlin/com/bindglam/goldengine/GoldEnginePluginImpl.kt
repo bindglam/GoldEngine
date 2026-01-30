@@ -5,6 +5,8 @@ import com.bindglam.goldengine.listeners.PlayerJoinQuitListener
 import com.bindglam.goldengine.manager.AccountManagerImpl
 import com.bindglam.goldengine.manager.CommandManager
 import com.bindglam.goldengine.manager.CompatibilityManager
+import com.bindglam.goldengine.manager.LanguageManager
+import com.bindglam.goldengine.manager.LanguageManagerImpl
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
@@ -18,6 +20,7 @@ class GoldEnginePluginImpl : JavaPlugin(), GoldEnginePlugin {
     private val managers = listOf(
         CommandManager,
         CompatibilityManager,
+        LanguageManagerImpl,
         AccountManagerImpl
     )
 
@@ -47,5 +50,6 @@ class GoldEnginePluginImpl : JavaPlugin(), GoldEnginePlugin {
 
     override fun config() = this.config
     override fun database() = this.database
+    override fun languageManager() = LanguageManagerImpl
     override fun accountManager() = AccountManagerImpl
 }
