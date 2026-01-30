@@ -12,8 +12,6 @@ import dev.jorel.commandapi.arguments.DoubleArgument
 import dev.jorel.commandapi.arguments.OfflinePlayerArgument
 import dev.jorel.commandapi.executors.CommandExecutor
 import dev.jorel.commandapi.executors.PlayerCommandExecutor
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.OfflinePlayer
 import java.math.BigDecimal
 import java.text.DecimalFormat
@@ -24,15 +22,12 @@ object CommandManager : Managerial {
     override fun start() {
         CommandAPI.onLoad(CommandAPIBukkitConfig(GoldEngine.instance().plugin()))
 
-        CommandAPICommand("money")
-            .withAliases("돈")
+        CommandAPICommand("goldengine")
+            .withPermission(CommandPermission.OP)
             .withSubcommands(
                 CommandAPICommand("balance")
-                    .withAliases("잔액")
-                    .withPermission(CommandPermission.OP)
                     .withSubcommands(
                         CommandAPICommand("get")
-                            .withAliases("확인")
                             .withArguments(OfflinePlayerArgument("target"))
                             .executes(CommandExecutor { sender, args ->
                                 val target = args["target"] as OfflinePlayer
@@ -43,7 +38,6 @@ object CommandManager : Managerial {
                                 }
                             }),
                         CommandAPICommand("set")
-                            .withAliases("설정")
                             .withArguments(OfflinePlayerArgument("target"), DoubleArgument("amount"))
                             .executes(CommandExecutor { sender, args ->
                                 val target = args["target"] as OfflinePlayer
@@ -56,7 +50,6 @@ object CommandManager : Managerial {
                                 }
                             }),
                         CommandAPICommand("add")
-                            .withAliases("추가")
                             .withArguments(OfflinePlayerArgument("target"), DoubleArgument("amount"))
                             .executes(CommandExecutor { sender, args ->
                                 val target = args["target"] as OfflinePlayer
@@ -69,7 +62,6 @@ object CommandManager : Managerial {
                                 }
                             }),
                         CommandAPICommand("subtract")
-                            .withAliases("차감")
                             .withArguments(OfflinePlayerArgument("target"), DoubleArgument("amount"))
                             .executes(CommandExecutor { sender, args ->
                                 val target = args["target"] as OfflinePlayer
@@ -82,6 +74,31 @@ object CommandManager : Managerial {
                                 }
                             })
                     )
+            )
+            .register()
+
+        CommandAPICommand("돈")
+            .withSubcommands(
+                CommandAPICommand("보내기")
+                    .withArguments(OfflinePlayerArgument("받는플레이어"), DoubleArgument("돈"))
+                    .executesPlayer(PlayerCommandExecutor { player, args ->
+                        val target = args["받는플레이어"] as OfflinePlayer
+                        val amount = BigDecimal.valueOf(args["돈"] as Double)
+
+                        AccountManagerImpl.getAccount(player.uniqueId).thenAccept { account -> account.use {
+                            AccountManagerImpl.getAccount(target.uniqueId).thenAccept { targetAccount -> targetAccount.use {
+                                if(account.balance() < amount) {
+                                    player.sendMessage(lang("error_insufficient_money"))
+                                    return@thenAccept
+                                }
+                                targetAccount.modifyBalance(amount, Operation.ADD)
+                                account.modifyBalance(amount, Operation.SUBTRACT)
+
+                                player.sendMessage(lang("command_money_send_sender", target.name ?: "Unknown", "${decimalFormat.format(account.balance())}${GoldEngine.instance().config().economy.currencyName.value()}"))
+                                target.player?.sendMessage(lang("command_money_send_target", player.name, "${decimalFormat.format(targetAccount.balance())}${GoldEngine.instance().config().economy.currencyName.value()}"))
+                            } }
+                        } }
+                    })
             )
             .executesPlayer(PlayerCommandExecutor { player, _ ->
                 AccountManagerImpl.getAccount(player.uniqueId).thenAccept { account ->

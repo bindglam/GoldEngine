@@ -1,2 +1,5 @@
+error_insufficient_money: "<red>잔액이 부족합니다."
 command_money: "<yellow>현재 잔액: %s"
 command_money_balance_get: "<yellow>%s님의 현재 잔액: %s"
+command_money_send_sender: "<green>성공적으로 %s님께 돈을 송금하였습니다. ( 잔액: %s )"
+command_money_send_target: "<green>%s님께서 돈을 송금하셨습니다. ( 잔액: %s )"
