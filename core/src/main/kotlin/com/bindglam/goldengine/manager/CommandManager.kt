@@ -23,11 +23,14 @@ object CommandManager : Managerial {
         CommandAPI.onLoad(CommandAPIBukkitConfig(GoldEngine.instance().plugin()))
 
         CommandAPICommand("money")
+            .withAliases("돈")
             .withSubcommands(
                 CommandAPICommand("balance")
+                    .withAliases("잔액")
                     .withPermission(CommandPermission.OP)
                     .withSubcommands(
                         CommandAPICommand("get")
+                            .withAliases("확인")
                             .withArguments(OfflinePlayerArgument("target"))
                             .executes(CommandExecutor { sender, args ->
                                 val target = args["target"] as OfflinePlayer
@@ -39,6 +42,7 @@ object CommandManager : Managerial {
                                 }
                             }),
                         CommandAPICommand("set")
+                            .withAliases("설정")
                             .withArguments(OfflinePlayerArgument("target"), DoubleArgument("amount"))
                             .executes(CommandExecutor { sender, args ->
                                 val target = args["target"] as OfflinePlayer
@@ -52,6 +56,7 @@ object CommandManager : Managerial {
                                 }
                             }),
                         CommandAPICommand("add")
+                            .withAliases("추가")
                             .withArguments(OfflinePlayerArgument("target"), DoubleArgument("amount"))
                             .executes(CommandExecutor { sender, args ->
                                 val target = args["target"] as OfflinePlayer
@@ -65,6 +70,7 @@ object CommandManager : Managerial {
                                 }
                             }),
                         CommandAPICommand("subtract")
+                            .withAliases("차감")
                             .withArguments(OfflinePlayerArgument("target"), DoubleArgument("amount"))
                             .executes(CommandExecutor { sender, args ->
                                 val target = args["target"] as OfflinePlayer
