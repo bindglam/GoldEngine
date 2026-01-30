@@ -23,9 +23,9 @@ object CommandManager : Managerial {
         CommandAPI.onLoad(CommandAPIBukkitConfig(GoldEngine.instance().plugin()))
 
         CommandAPICommand("money")
-            .withPermission(CommandPermission.OP)
             .withSubcommands(
                 CommandAPICommand("balance")
+                    .withPermission(CommandPermission.OP)
                     .withSubcommands(
                         CommandAPICommand("get")
                             .withArguments(OfflinePlayerArgument("target"))
