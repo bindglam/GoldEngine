@@ -5,7 +5,7 @@ import com.bindglam.goldengine.listeners.PlayerJoinQuitListener
 import com.bindglam.goldengine.manager.AccountManagerImpl
 import com.bindglam.goldengine.manager.CommandManager
 import com.bindglam.goldengine.manager.CompatibilityManager
-import com.bindglam.goldengine.manager.LanguageManager
+import com.bindglam.goldengine.manager.ContextImpl
 import com.bindglam.goldengine.manager.LanguageManagerImpl
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
@@ -39,11 +39,11 @@ class GoldEnginePluginImpl : JavaPlugin(), GoldEnginePlugin {
         this.database = this.config.database.type.value().create(this.config)
         this.database.start()
 
-        this.managers.forEach { it.start() }
+        this.managers.forEach { it.start(ContextImpl(this)) }
     }
 
     override fun onDisable() {
-        this.managers.forEach { it.end() }
+        this.managers.forEach { it.end(ContextImpl(this)) }
 
         this.database.stop()
     }

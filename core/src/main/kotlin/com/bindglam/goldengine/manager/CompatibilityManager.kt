@@ -9,13 +9,13 @@ object CompatibilityManager : Managerial {
 
     private val enabledCompatibilities = arrayListOf<Compatibility>()
 
-    override fun start() {
+    override fun start(context: Context) {
         enabledCompatibilities.addAll(compatibilities
             .filter { compat -> Bukkit.getPluginManager().isPluginEnabled(compat.requiredPlugin) })
         enabledCompatibilities.forEach { it.start() }
     }
 
-    override fun end() {
+    override fun end(context: Context) {
         enabledCompatibilities.forEach { it.end() }
         enabledCompatibilities.clear()
     }

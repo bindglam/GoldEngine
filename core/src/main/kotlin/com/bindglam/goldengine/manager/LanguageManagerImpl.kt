@@ -1,6 +1,6 @@
 package com.bindglam.goldengine.manager
 
-import com.bindglam.goldengine.GoldEngine
+import com.bindglam.goldengine.GoldEngineConfiguration
 import com.bindglam.goldengine.lang.Language
 import com.bindglam.goldengine.utils.plugin
 import java.io.File
@@ -11,7 +11,11 @@ object LanguageManagerImpl : LanguageManager {
 
     private val langs = hashMapOf<String, Language>()
 
-    override fun start() {
+    private lateinit var config: GoldEngineConfiguration
+
+    override fun start(context: Context) {
+        this.config = context.config()
+
         if(!langsFolder.exists())
             langsFolder.mkdirs()
 
@@ -20,7 +24,7 @@ object LanguageManagerImpl : LanguageManager {
             if(file.exists()) return@forEach
             file.createNewFile()
 
-            GoldEngine.instance().plugin().getResource("langs/$name.yml")?.copyTo(file.outputStream())
+            context.plugin().plugin().getResource("langs/$name.yml")?.copyTo(file.outputStream())
         }
 
         langsFolder.listFiles().forEach { file ->
@@ -29,5 +33,5 @@ object LanguageManagerImpl : LanguageManager {
         }
     }
 
-    override fun lang() = langs[GoldEngine.instance().config().language.value()]!!
+    override fun lang() = langs[this.config.language.value()]!!
 }

@@ -1,12 +1,9 @@
 package com.bindglam.goldengine.manager;
 
 public interface Managerial {
-    default void init() {
+    default void start(Context context) {
     }
 
-    default void start() {
-    }
-
-    default void end() {
+    default void end(Context context) {
     }
 }

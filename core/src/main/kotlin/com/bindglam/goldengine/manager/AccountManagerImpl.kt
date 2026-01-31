@@ -1,20 +1,19 @@
 package com.bindglam.goldengine.manager
 
-import com.bindglam.goldengine.GoldEngine
 import com.bindglam.goldengine.account.Account
 import com.bindglam.goldengine.account.OfflineAccount
 import com.bindglam.goldengine.account.OnlineAccount
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 
 object AccountManagerImpl : AccountManager {
     private val onlineAccounts = ConcurrentHashMap<UUID, OnlineAccount>()
 
-    override fun start() {
-        GoldEngine.instance().database().getConnection { connection ->
+    override fun start(context: Context) {
+        context.plugin().database().getConnection { connection ->
             connection.createStatement().use { statement ->
                 statement.execute("CREATE TABLE IF NOT EXISTS ${AccountManager.ACCOUNTS_TABLE_NAME}" +
                         "(holder VARCHAR(36) PRIMARY KEY, balance DECIMAL)")
@@ -24,7 +23,7 @@ object AccountManagerImpl : AccountManager {
         Bukkit.getOnlinePlayers().forEach { loadOnlineAccount(it) }
     }
 
-    override fun end() {
+    override fun end(context: Context) {
         Bukkit.getOnlinePlayers().forEach { disposeOnlineAccount(it) }
     }
 

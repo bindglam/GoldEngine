@@ -1,6 +1,5 @@
 package com.bindglam.goldengine.manager
 
-import com.bindglam.goldengine.GoldEngine
 import com.bindglam.goldengine.account.Operation
 import com.bindglam.goldengine.utils.formatCurrency
 import com.bindglam.goldengine.utils.lang
@@ -18,8 +17,8 @@ import org.bukkit.OfflinePlayer
 import java.math.BigDecimal
 
 object CommandManager : Managerial {
-    override fun start() {
-        CommandAPI.onLoad(CommandAPIBukkitConfig(GoldEngine.instance().plugin()))
+    override fun start(context: Context) {
+        CommandAPI.onLoad(CommandAPIBukkitConfig(context.plugin().plugin()))
 
         CommandAPICommand("goldengine")
             .withPermission(CommandPermission.OP)
@@ -100,13 +99,13 @@ object CommandManager : Managerial {
                     }),
                 CommandAPICommand("자랑")
                     .executesPlayer(PlayerCommandExecutor { player, _ ->
-                        if(!GoldEngine.instance().config().features.boast.enabled.value()) {
+                        if(!context.config().features.boast.enabled.value()) {
                             player.sendMessage(lang("error_inavailable_feature"))
                             return@PlayerCommandExecutor
                         }
 
                         AccountManagerImpl.getAccount(player.uniqueId).thenAccept { account -> account.use {
-                            val cost = BigDecimal.valueOf(GoldEngine.instance().config().features.boast.cost.value())
+                            val cost = BigDecimal.valueOf(context.config().features.boast.cost.value())
 
                             if(account.balance() < cost) {
                                 player.sendMessage(lang("error_insufficient_money_with_cost", formatCurrency(cost)))
@@ -132,7 +131,7 @@ object CommandManager : Managerial {
         CommandAPI.onEnable()
     }
 
-    override fun end() {
+    override fun end(context: Context) {
         CommandAPI.onDisable()
     }
 }
