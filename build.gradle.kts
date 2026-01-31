@@ -40,5 +40,6 @@ tasks {
         prefix("kotlin")
         prefix("dev.jorel.commandapi")
         prefix("com.bindglam.config")
+        prefix("com.alibaba.fastjson2")
     }
 }
