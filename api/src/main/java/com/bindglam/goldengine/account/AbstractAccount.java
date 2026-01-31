@@ -1,6 +1,7 @@
 package com.bindglam.goldengine.account;
 
 import com.bindglam.goldengine.GoldEngine;
+import com.bindglam.goldengine.currency.Currency;
 import com.bindglam.goldengine.manager.AccountManager;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -8,12 +9,15 @@ import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public abstract class AbstractAccount implements Account {
     private final UUID holder;
 
-    private BigDecimal balance;
+    private final Map<String, BigDecimal> balance = new HashMap<>();
     private boolean isJustCreated;
 
     public AbstractAccount(UUID holder) {
@@ -29,11 +33,15 @@ public abstract class AbstractAccount implements Account {
 
                 ResultSet result = statement.executeQuery();
                 if(result.next()) {
-                    this.balance = result.getBigDecimal("balance");
+                    for (Currency currency : GoldEngine.instance().currencyManager().registry().entries()) {
+                        this.balance.put(currency.id(), result.getBigDecimal(currency.id()));
+                    }
 
                     this.isJustCreated = false;
                 } else {
-                    this.balance = new BigDecimal("0.0");
+                    for (Currency currency : GoldEngine.instance().currencyManager().registry().entries()) {
+                        this.balance.put(currency.id(), BigDecimal.ZERO);
+                    }
 
                     this.isJustCreated = true;
                 }
@@ -43,18 +51,38 @@ public abstract class AbstractAccount implements Account {
 
     @ApiStatus.Internal
     public void save() {
+        List<Currency> currencies = GoldEngine.instance().currencyManager().registry().entries().stream().toList();
+
         GoldEngine.instance().database().getConnection((connection) -> {
             if (this.isJustCreated) {
-                try (PreparedStatement statement = connection.prepareStatement("INSERT INTO " + AccountManager.ACCOUNTS_TABLE_NAME + " (holder, balance) VALUES (?, ?)")) {
+                StringBuilder balanceNames = new StringBuilder();
+                for (int i = 0; i < currencies.size(); i++) {
+                    balanceNames.append(currencies.get(i).id());
+                    if(i < currencies.size()-1)
+                        balanceNames.append(", ");
+                }
+
+                try (PreparedStatement statement = connection.prepareStatement("INSERT INTO " + AccountManager.ACCOUNTS_TABLE_NAME + " (holder, " + balanceNames + ") VALUES (?, ?)")) {
                     statement.setString(1, this.holder.toString());
-                    statement.setBigDecimal(2, this.balance);
+                    for (int i = 0; i < currencies.size(); i++) {
+                        statement.setBigDecimal(2 + i, this.balance(currencies.get(i)));
+                    }
 
                     statement.executeUpdate();
                 }
             } else {
-                try (PreparedStatement statement = connection.prepareStatement("UPDATE " + AccountManager.ACCOUNTS_TABLE_NAME + " SET balance = ? WHERE holder = ?")) {
-                    statement.setBigDecimal(1, this.balance);
-                    statement.setString(2, this.holder.toString());
+                StringBuilder balanceFields = new StringBuilder();
+                for (int i = 0; i < currencies.size(); i++) {
+                    balanceFields.append(currencies.get(i).id()).append(" = ?");
+                    if(i < currencies.size()-1)
+                        balanceFields.append(", ");
+                }
+
+                try (PreparedStatement statement = connection.prepareStatement("UPDATE " + AccountManager.ACCOUNTS_TABLE_NAME + " SET " + balanceFields + " WHERE holder = ?")) {
+                    for (int i = 0; i < currencies.size(); i++) {
+                        statement.setBigDecimal(1 + i, this.balance(currencies.get(i)));
+                    }
+                    statement.setString(currencies.size() + 1, this.holder.toString());
 
                     statement.executeUpdate();
                 }
@@ -68,21 +96,21 @@ public abstract class AbstractAccount implements Account {
     }
 
     @Override
-    public BigDecimal balance() {
-        return this.balance;
+    public BigDecimal balance(Currency currency) {
+        return this.balance.getOrDefault(currency.id(), BigDecimal.ZERO);
     }
 
     @Override
-    public void balance(BigDecimal balance) {
-        this.balance = balance;
+    public void balance(Currency currency, BigDecimal balance) {
+        this.balance.put(currency.id(), balance);
     }
 
     @Override
-    public boolean modifyBalance(BigDecimal amount, Operation operation) {
-        Operation.Result result = operation.operate(this.balance, amount);
+    public boolean modifyBalance(Currency currency, BigDecimal amount, Operation operation) {
+        Operation.Result result = operation.operate(this.balance(currency), amount);
         if(result.isFailed())
             return false;
-        this.balance = result.result();
+        this.balance(currency, result.result());
         return true;
     }
 

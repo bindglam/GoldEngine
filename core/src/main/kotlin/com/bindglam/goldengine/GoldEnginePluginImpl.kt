@@ -6,6 +6,8 @@ import com.bindglam.goldengine.manager.AccountManagerImpl
 import com.bindglam.goldengine.manager.CommandManager
 import com.bindglam.goldengine.manager.CompatibilityManager
 import com.bindglam.goldengine.manager.ContextImpl
+import com.bindglam.goldengine.manager.CurrencyManager
+import com.bindglam.goldengine.manager.CurrencyManagerImpl
 import com.bindglam.goldengine.manager.LanguageManagerImpl
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
@@ -21,6 +23,7 @@ class GoldEnginePluginImpl : JavaPlugin(), GoldEnginePlugin {
         CommandManager,
         CompatibilityManager,
         LanguageManagerImpl,
+        CurrencyManagerImpl,
         AccountManagerImpl
     )
 
@@ -52,4 +55,5 @@ class GoldEnginePluginImpl : JavaPlugin(), GoldEnginePlugin {
     override fun database() = this.database
     override fun languageManager() = LanguageManagerImpl
     override fun accountManager() = AccountManagerImpl
+    override fun currencyManager() = CurrencyManagerImpl
 }

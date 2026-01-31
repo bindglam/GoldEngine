@@ -2,6 +2,7 @@ package com.bindglam.goldengine;
 
 import com.bindglam.goldengine.database.Database;
 import com.bindglam.goldengine.manager.AccountManager;
+import com.bindglam.goldengine.manager.CurrencyManager;
 import com.bindglam.goldengine.manager.LanguageManager;
 
 public interface GoldEnginePlugin {
@@ -12,4 +13,6 @@ public interface GoldEnginePlugin {
     LanguageManager languageManager();
 
     AccountManager accountManager();
+
+    CurrencyManager currencyManager();
 }

@@ -1,5 +1,6 @@
 package com.bindglam.goldengine.manager
 
+import com.bindglam.goldengine.GoldEngine
 import com.bindglam.goldengine.account.Account
 import com.bindglam.goldengine.account.OfflineAccount
 import com.bindglam.goldengine.account.OnlineAccount
@@ -13,10 +14,18 @@ object AccountManagerImpl : AccountManager {
     private val onlineAccounts = ConcurrentHashMap<UUID, OnlineAccount>()
 
     override fun start(context: Context) {
+        val balanceFields = StringBuilder()
+        val currencies = GoldEngine.instance().currencyManager().registry().entries().toList()
+        for(i in 0..<currencies.size) {
+            balanceFields.append(currencies[i].id()).append(" DECIMAL")
+            if(i < currencies.size-1)
+                balanceFields.append(", ")
+        }
+
         context.plugin().database().getConnection { connection ->
             connection.createStatement().use { statement ->
                 statement.execute("CREATE TABLE IF NOT EXISTS ${AccountManager.ACCOUNTS_TABLE_NAME}" +
-                        "(holder VARCHAR(36) PRIMARY KEY, balance DECIMAL)")
+                        "(holder VARCHAR(36) PRIMARY KEY, $balanceFields)")
             }
         }
 
