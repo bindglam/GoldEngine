@@ -1,5 +1,6 @@
 package com.bindglam.goldengine.manager
 
+import com.bindglam.goldengine.GoldEngine
 import com.bindglam.goldengine.account.Account
 import com.bindglam.goldengine.account.OfflineAccount
 import com.bindglam.goldengine.account.OnlineAccount
@@ -16,7 +17,7 @@ object AccountManagerImpl : AccountManager {
         context.plugin().database().getConnection { connection ->
             connection.createStatement().use { statement ->
                 statement.execute("CREATE TABLE IF NOT EXISTS ${AccountManager.ACCOUNTS_TABLE_NAME}" +
-                        "(holder VARCHAR(36) PRIMARY KEY, balance DECIMAL)")
+                        "(holder VARCHAR(36) PRIMARY KEY, balance JSON)")
             }
         }
 

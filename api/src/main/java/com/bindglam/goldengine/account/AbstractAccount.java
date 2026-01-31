@@ -1,6 +1,9 @@
 package com.bindglam.goldengine.account;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.bindglam.goldengine.GoldEngine;
+import com.bindglam.goldengine.currency.Currency;
 import com.bindglam.goldengine.manager.AccountManager;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -8,12 +11,14 @@ import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public abstract class AbstractAccount implements Account {
     private final UUID holder;
 
-    private BigDecimal balance;
+    private final Map<String, BigDecimal> balance = new HashMap<>();
     private boolean isJustCreated;
 
     public AbstractAccount(UUID holder) {
@@ -29,11 +34,16 @@ public abstract class AbstractAccount implements Account {
 
                 ResultSet result = statement.executeQuery();
                 if(result.next()) {
-                    this.balance = result.getBigDecimal("balance");
+                    JSONObject json = JSON.parseObject(result.getString("balance"));
+                    for (Currency currency : GoldEngine.instance().currencyManager().registry().entries()) {
+                        this.balance.put(currency.id(), json.getBigDecimal(currency.id()));
+                    }
 
                     this.isJustCreated = false;
                 } else {
-                    this.balance = new BigDecimal("0.0");
+                    for (Currency currency : GoldEngine.instance().currencyManager().registry().entries()) {
+                        this.balance.put(currency.id(), BigDecimal.ZERO);
+                    }
 
                     this.isJustCreated = true;
                 }
@@ -47,13 +57,23 @@ public abstract class AbstractAccount implements Account {
             if (this.isJustCreated) {
                 try (PreparedStatement statement = connection.prepareStatement("INSERT INTO " + AccountManager.ACCOUNTS_TABLE_NAME + " (holder, balance) VALUES (?, ?)")) {
                     statement.setString(1, this.holder.toString());
-                    statement.setBigDecimal(2, this.balance);
+
+                    JSONObject json = new JSONObject();
+                    GoldEngine.instance().currencyManager().registry().entries().forEach(currency -> {
+                        json.put(currency.id(), this.balance(currency));
+                    });
+                    statement.setString(2, json.toString());
 
                     statement.executeUpdate();
                 }
             } else {
                 try (PreparedStatement statement = connection.prepareStatement("UPDATE " + AccountManager.ACCOUNTS_TABLE_NAME + " SET balance = ? WHERE holder = ?")) {
-                    statement.setBigDecimal(1, this.balance);
+                    JSONObject json = new JSONObject();
+                    GoldEngine.instance().currencyManager().registry().entries().forEach(currency -> {
+                        json.put(currency.id(), this.balance(currency));
+                    });
+                    statement.setString(1, json.toString());
+
                     statement.setString(2, this.holder.toString());
 
                     statement.executeUpdate();
@@ -68,21 +88,21 @@ public abstract class AbstractAccount implements Account {
     }
 
     @Override
-    public BigDecimal balance() {
-        return this.balance;
+    public BigDecimal balance(Currency currency) {
+        return this.balance.getOrDefault(currency.id(), BigDecimal.ZERO);
     }
 
     @Override
-    public void balance(BigDecimal balance) {
-        this.balance = balance;
+    public void balance(Currency currency, BigDecimal balance) {
+        this.balance.put(currency.id(), balance);
     }
 
     @Override
-    public boolean modifyBalance(BigDecimal amount, Operation operation) {
-        Operation.Result result = operation.operate(this.balance, amount);
+    public boolean modifyBalance(Currency currency, BigDecimal amount, Operation operation) {
+        Operation.Result result = operation.operate(this.balance(currency), amount);
         if(result.isFailed())
             return false;
-        this.balance = result.result();
+        this.balance(currency, result.result());
         return true;
     }
 
