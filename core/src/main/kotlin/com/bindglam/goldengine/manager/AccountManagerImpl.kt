@@ -46,8 +46,7 @@ object AccountManagerImpl : AccountManager {
             getOfflineAccount(uuid)
     }
 
-    override fun getOnlineAccount(uuid: UUID): OnlineAccount? =
-        onlineAccounts[uuid] as OnlineAccount?
+    override fun getOnlineAccount(uuid: UUID): OnlineAccount? = onlineAccounts[uuid]
 
     override fun getOfflineAccount(uuid: UUID): CompletableFuture<OfflineAccount> =
         CompletableFuture.supplyAsync { OfflineAccount(uuid) }
