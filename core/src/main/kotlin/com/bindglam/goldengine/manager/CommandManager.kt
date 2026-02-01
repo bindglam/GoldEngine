@@ -39,7 +39,7 @@ object CommandManager : Managerial {
         manager.command(manager.commandBuilder("goldengine")
             .literal("balance")
             .literal("get")
-            .required("target", StringParser.stringParser())
+            .required("target", StringParser.stringParser(), SuggestionProvider.blocking { _, _ -> Bukkit.getOnlinePlayers().map { Suggestion.suggestion(it.name) } })
             .required("currency", StringParser.stringParser(), SuggestionProvider.blocking { _, _ -> CurrencyManagerImpl.registry().entries().map { Suggestion.suggestion(it.id()) } })
             .handler { ctx ->
                 val target = Bukkit.getOfflinePlayer(ctx.get<String>("target"))
@@ -57,7 +57,7 @@ object CommandManager : Managerial {
         manager.command(manager.commandBuilder("goldengine")
             .literal("balance")
             .literal("set")
-            .required("target", StringParser.stringParser())
+            .required("target", StringParser.stringParser(), SuggestionProvider.blocking { _, _ -> Bukkit.getOnlinePlayers().map { Suggestion.suggestion(it.name) } })
             .required("currency", StringParser.stringParser(), SuggestionProvider.blocking { _, _ -> CurrencyManagerImpl.registry().entries().map { Suggestion.suggestion(it.id()) } })
             .required("amount", DoubleParser.doubleParser(0.0))
             .handler { ctx ->
@@ -78,7 +78,7 @@ object CommandManager : Managerial {
         manager.command(manager.commandBuilder("goldengine")
             .literal("balance")
             .literal("add")
-            .required("target", StringParser.stringParser())
+            .required("target", StringParser.stringParser(), SuggestionProvider.blocking { _, _ -> Bukkit.getOnlinePlayers().map { Suggestion.suggestion(it.name) } })
             .required("currency", StringParser.stringParser(), SuggestionProvider.blocking { _, _ -> CurrencyManagerImpl.registry().entries().map { Suggestion.suggestion(it.id()) } })
             .required("amount", DoubleParser.doubleParser(0.0))
             .handler { ctx ->
@@ -99,7 +99,7 @@ object CommandManager : Managerial {
         manager.command(manager.commandBuilder("goldengine")
             .literal("balance")
             .literal("subtract")
-            .required("target", StringParser.stringParser())
+            .required("target", StringParser.stringParser(), SuggestionProvider.blocking { _, _ -> Bukkit.getOnlinePlayers().map { Suggestion.suggestion(it.name) } })
             .required("currency", StringParser.stringParser(), SuggestionProvider.blocking { _, _ -> CurrencyManagerImpl.registry().entries().map { Suggestion.suggestion(it.id()) } })
             .required("amount", DoubleParser.doubleParser(0.0))
             .handler { ctx ->
