@@ -63,9 +63,8 @@ public abstract class AbstractAccount implements Account {
                     statement.setString(1, this.holder.toString());
 
                     JSONObject json = new JSONObject();
-                    GoldEngine.instance().currencyManager().registry().entries().forEach(currency -> {
-                        json.put(currency.id(), this.balance(currency));
-                    });
+                    GoldEngine.instance().currencyManager().registry().entries().forEach(currency ->
+                            json.put(currency.id(), this.balance(currency)));
                     statement.setString(2, json.toString());
 
                     statement.executeUpdate();
@@ -73,9 +72,8 @@ public abstract class AbstractAccount implements Account {
             } else {
                 try (PreparedStatement statement = connection.prepareStatement("UPDATE " + AccountManager.ACCOUNTS_TABLE_NAME + " SET balance = ? WHERE holder = ?")) {
                     JSONObject json = new JSONObject();
-                    GoldEngine.instance().currencyManager().registry().entries().forEach(currency -> {
-                        json.put(currency.id(), this.balance(currency));
-                    });
+                    GoldEngine.instance().currencyManager().registry().entries().forEach(currency ->
+                            json.put(currency.id(), this.balance(currency)));
                     statement.setString(1, json.toString());
 
                     statement.setString(2, this.holder.toString());
