@@ -13,7 +13,6 @@ GoldEngine은 마인크래프트 Paper 서버에 다양한 화폐 시스템을 �
 build.gradle.kts
 ```kotlin
 repositories {
-    mavenCentral()
     maven("https://jitpack.io")
 }
 
