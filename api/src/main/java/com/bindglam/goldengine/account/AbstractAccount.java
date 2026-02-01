@@ -36,7 +36,11 @@ public abstract class AbstractAccount implements Account {
                 if(result.next()) {
                     JSONObject json = JSON.parseObject(result.getString("balance"));
                     for (Currency currency : GoldEngine.instance().currencyManager().registry().entries()) {
-                        this.balance.put(currency.id(), json.getBigDecimal(currency.id()));
+                        if(json.containsKey(currency.id())) {
+                            this.balance.put(currency.id(), json.getBigDecimal(currency.id()));
+                        } else {
+                            this.balance.put(currency.id(), BigDecimal.ZERO);
+                        }
                     }
 
                     this.isJustCreated = false;
