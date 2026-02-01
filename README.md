@@ -1,5 +1,7 @@
 # 💴 GoldEngine
 
+[![CodeFactor](https://www.codefactor.io/repository/github/bindglam/goldengine/badge)](https://www.codefactor.io/repository/github/bindglam/goldengine)
+
 GoldEngine은 마인크래프트 Paper 서버에 다양한 화폐 시스템을 손쉽게 추가하고 관리할 수 있도록 돕는 플러그인입니다.
 
 ## 🚀 주요 기능
