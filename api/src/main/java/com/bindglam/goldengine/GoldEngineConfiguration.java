@@ -30,15 +30,6 @@ public final class GoldEngineConfiguration extends Configuration {
         }
     }
 
-    public final Features features = new Features();
-    public final class Features {
-        public final Boast boast = new Boast();
-        public final class Boast {
-            public final Field<Boolean> enabled = createPrimitiveField("features.boast.enabled", true);
-            public final Field<Double> cost = createPrimitiveField("features.boast.cost", 50000.0);
-        }
-    }
-
     public GoldEngineConfiguration(File file) {
         super(file);
     }
