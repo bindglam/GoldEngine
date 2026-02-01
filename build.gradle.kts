@@ -41,7 +41,9 @@ tasks {
             relocate(pattern, "$groupString.shaded.$pattern")
         }
         prefix("kotlin")
-        prefix("dev.jorel.commandapi")
+        prefix("org.incendo.cloud")
+        prefix("org.slf4j")
+        prefix("io.leangen.geantyref")
         prefix("com.bindglam.config")
         prefix("com.alibaba.fastjson2")
         prefix("com.zaxxer.hikari")
