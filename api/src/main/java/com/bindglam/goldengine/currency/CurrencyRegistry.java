@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.util.*;
 
 /**
- * A registry class that stores currency definitions.
+ * A registry interface that stores currency definitions.
  *
  * @author bindglam
  */

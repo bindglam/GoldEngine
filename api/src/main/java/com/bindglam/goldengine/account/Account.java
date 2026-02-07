@@ -17,5 +17,8 @@ public interface Account extends AutoCloseable {
      */
     @NotNull UUID holder();
 
+    /**
+     * Get the account's balance
+     */
     @NotNull Balance balance();
 }

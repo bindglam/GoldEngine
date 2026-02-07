@@ -5,6 +5,11 @@ import com.bindglam.goldengine.currency.Currency;
 
 import java.math.BigDecimal;
 
+/**
+ * An interface for account's balance
+ *
+ * @author bindglam
+ */
 public interface Balance {
     /**
      * Get the balance of the account in the given currency
