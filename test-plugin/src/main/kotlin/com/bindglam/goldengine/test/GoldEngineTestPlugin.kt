@@ -47,8 +47,8 @@ class GoldEngineTestPlugin : JavaPlugin() {
                                     player.sendMessage(Component.text("돈이 부족합니다!").color(NamedTextColor.RED))
                                     return@thenAccept
                                 }
-                                targetAccount.balance().modify(won(), amount, Operation.ADD)
-                                account.balance().modify(won(), amount, Operation.SUBTRACT)
+                                targetAccount.balance().modify(won(), amount, Operation.DEPOSIT)
+                                account.balance().modify(won(), amount, Operation.WITHDRAW)
 
                                 player.sendMessage(Component.text("${target.name ?: "누군가"}님에게 성공적으로 ${won().format(amount)}을 보냈습니다! ( 잔액: ${won().format(account.balance()[won()])} )")
                                     .color(NamedTextColor.YELLOW))
@@ -71,7 +71,7 @@ class GoldEngineTestPlugin : JavaPlugin() {
                                 .append(Component.text(won().format(account.balance()[won()])).color(NamedTextColor.GOLD))
                                 .append(Component.text("을 가지고 있습니다!").color(NamedTextColor.WHITE)))
 
-                            account.balance().modify(won(), cost, Operation.SUBTRACT)
+                            account.balance().modify(won(), cost, Operation.WITHDRAW)
 
                             player.sendMessage(Component.text("성공적으로 자랑하였습니다! ( 잔액: ${won().format(account.balance()[won()])} )").color(NamedTextColor.GREEN))
                         } }

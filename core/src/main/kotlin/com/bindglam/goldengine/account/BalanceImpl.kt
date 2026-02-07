@@ -31,13 +31,12 @@ class BalanceImpl : Balance {
     }
 
     override fun get(currency: Currency): BigDecimal = map[currency.id] ?: BigDecimal.ZERO
-    override fun set(currency: Currency, balance: BigDecimal) {
-        map[currency.id] = balance
-    }
-    override fun modify(currency: Currency, amount: BigDecimal, operation: Operation): Boolean {
+    override fun modify(currency: Currency, amount: BigDecimal, operation: Operation): Operation.Result {
         val result = operation.operate(get(currency), amount)
-        if (result.isFailed) return false
-        set(currency, result.result)
-        return true
+
+        if(result.isSuccess)
+            map[currency.id] = result.result
+
+        return result
     }
 }

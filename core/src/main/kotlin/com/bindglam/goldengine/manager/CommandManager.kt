@@ -58,67 +58,31 @@ object CommandManager : Managerial {
                 }
             })
         manager.command(manager.commandBuilder("goldengine")
-            .permission(Permission.of("goldengine.command.balance.set"))
+            .permission(Permission.of("goldengine.command.balance.modify"))
             .literal("balance")
-            .literal("set")
+            .literal("modify")
             .required("target", StringParser.stringParser(), SuggestionProvider.blocking { _, _ -> Bukkit.getOnlinePlayers().map { Suggestion.suggestion(it.name) } })
             .required("currency", StringParser.stringParser(), SuggestionProvider.blocking { _, _ -> CurrencyManagerImpl.registry().entries().map { Suggestion.suggestion(it.id()) } })
             .required("amount", DoubleParser.doubleParser(0.0))
+            .required("operation", StringParser.stringParser(), SuggestionProvider.suggesting(Operation.entries.map { Suggestion.suggestion(it.name) }))
             .handler { ctx ->
                 val target = Bukkit.getOfflinePlayer(ctx.get<String>("target"))
                 val currency = GoldEngine.instance().currencyManager().registry().get(ctx.get("currency")).orElse(null)
                 val amount = ctx.get<Double>("amount")
+                val operation: Operation
+                try {
+                    operation = Operation.valueOf(ctx.get("operation"))
+                } catch (_: IllegalArgumentException) {
+                    ctx.sender().sendMessage(lang("error_invalid_operation"))
+                    return@handler
+                }
                 if(currency == null) {
                     ctx.sender().sendMessage(lang("error_invalid_currency"))
                     return@handler
                 }
 
                 AccountManagerImpl.getAccount(target.uniqueId).thenAccept { account ->
-                    account.balance()[currency] = BigDecimal.valueOf(amount)
-                    ctx.sender().sendMessage(lang("command_money_balance_get", target.name ?: "Unknown", currency.format(account.balance()[currency])))
-                    account.close()
-                }
-            })
-        manager.command(manager.commandBuilder("goldengine")
-            .permission(Permission.of("goldengine.command.balance.add"))
-            .literal("balance")
-            .literal("add")
-            .required("target", StringParser.stringParser(), SuggestionProvider.blocking { _, _ -> Bukkit.getOnlinePlayers().map { Suggestion.suggestion(it.name) } })
-            .required("currency", StringParser.stringParser(), SuggestionProvider.blocking { _, _ -> CurrencyManagerImpl.registry().entries().map { Suggestion.suggestion(it.id()) } })
-            .required("amount", DoubleParser.doubleParser(0.0))
-            .handler { ctx ->
-                val target = Bukkit.getOfflinePlayer(ctx.get<String>("target"))
-                val currency = GoldEngine.instance().currencyManager().registry().get(ctx.get("currency")).orElse(null)
-                val amount = ctx.get<Double>("amount")
-                if(currency == null) {
-                    ctx.sender().sendMessage(lang("error_invalid_currency"))
-                    return@handler
-                }
-
-                AccountManagerImpl.getAccount(target.uniqueId).thenAccept { account ->
-                    account.balance().modify(currency, BigDecimal.valueOf(amount), Operation.ADD)
-                    ctx.sender().sendMessage(lang("command_money_balance_get", target.name ?: "Unknown", currency.format(account.balance()[currency])))
-                    account.close()
-                }
-            })
-        manager.command(manager.commandBuilder("goldengine")
-            .permission(Permission.of("goldengine.command.balance.subtract"))
-            .literal("balance")
-            .literal("subtract")
-            .required("target", StringParser.stringParser(), SuggestionProvider.blocking { _, _ -> Bukkit.getOnlinePlayers().map { Suggestion.suggestion(it.name) } })
-            .required("currency", StringParser.stringParser(), SuggestionProvider.blocking { _, _ -> CurrencyManagerImpl.registry().entries().map { Suggestion.suggestion(it.id()) } })
-            .required("amount", DoubleParser.doubleParser(0.0))
-            .handler { ctx ->
-                val target = Bukkit.getOfflinePlayer(ctx.get<String>("target"))
-                val currency = GoldEngine.instance().currencyManager().registry().get(ctx.get("currency")).orElse(null)
-                val amount = ctx.get<Double>("amount")
-                if(currency == null) {
-                    ctx.sender().sendMessage(lang("error_invalid_currency"))
-                    return@handler
-                }
-
-                AccountManagerImpl.getAccount(target.uniqueId).thenAccept { account ->
-                    account.balance().modify(currency, BigDecimal.valueOf(amount), Operation.SUBTRACT)
+                    account.balance().modify(currency, BigDecimal.valueOf(amount), operation)
                     ctx.sender().sendMessage(lang("command_money_balance_get", target.name ?: "Unknown", currency.format(account.balance()[currency])))
                     account.close()
                 }

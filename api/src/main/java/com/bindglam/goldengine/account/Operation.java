@@ -9,8 +9,9 @@ import java.util.function.BiFunction;
  * @author bindglam
  */
 public enum Operation {
-    ADD((a, b) -> Result.success(a.add(b))),
-    SUBTRACT((a, b) -> {
+    SET((a, b) -> Result.success(b)),
+    DEPOSIT((a, b) -> Result.success(a.add(b))),
+    WITHDRAW((a, b) -> {
         if(a.compareTo(b) < 0)
             return Result.failure();
 
