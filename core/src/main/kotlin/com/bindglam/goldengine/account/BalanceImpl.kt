@@ -31,8 +31,8 @@ class BalanceImpl : Balance {
     }
 
     override fun get(currency: Currency): BigDecimal = map[currency.id] ?: BigDecimal.ZERO
-    override fun modify(currency: Currency, amount: BigDecimal, operation: Operation): Operation.Result {
-        val result = operation.operate(get(currency), amount)
+    override fun modify(currency: Currency, value: BigDecimal, operation: Operation): Operation.Result {
+        val result = operation.operate(get(currency), value)
 
         if(result.isSuccess)
             map[currency.id] = result.result

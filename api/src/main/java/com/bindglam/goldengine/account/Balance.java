@@ -22,10 +22,10 @@ public interface Balance {
      * Modify the balance of the account in the given currency
      *
      * @param currency currency
-     * @param amount amount
+     * @param value value
      * @param operation operation
      */
-    Operation.Result modify(Currency currency, BigDecimal amount, Operation operation);
+    Operation.Result modify(Currency currency, BigDecimal value, Operation operation);
 
     /**
      * Get the balance of the account in the default currency
@@ -37,10 +37,10 @@ public interface Balance {
     /**
      * Modify the balance of the account in the default currency
      *
-     * @param amount amount
+     * @param value value
      * @param operation operation
      */
-    default Operation.Result modify(BigDecimal amount, Operation operation) {
-        return modify(GoldEngine.instance().currencyManager().defaultCurrency(), amount, operation);
+    default Operation.Result modify(BigDecimal value, Operation operation) {
+        return modify(GoldEngine.instance().currencyManager().defaultCurrency(), value, operation);
     }
 }
