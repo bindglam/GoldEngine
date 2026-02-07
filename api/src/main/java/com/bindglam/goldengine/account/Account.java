@@ -42,17 +42,26 @@ public interface Account extends AutoCloseable {
      */
     boolean modifyBalance(Currency currency, BigDecimal amount, Operation operation);
 
-    @Deprecated
+    /**
+     * Get the balance of the account in the default currency
+     */
     default BigDecimal balance() {
         return balance(GoldEngine.instance().currencyManager().defaultCurrency());
     }
 
-    @Deprecated
+    /**
+     * Set the balance of the account in the default currency
+     */
     default void balance(BigDecimal balance) {
         balance(GoldEngine.instance().currencyManager().defaultCurrency(), balance);
     }
 
-    @Deprecated
+    /**
+     * Modify the balance of the account in the default currency
+     *
+     * @param amount amount
+     * @param operation operation
+     */
     default boolean modifyBalance(BigDecimal amount, Operation operation) {
         return modifyBalance(GoldEngine.instance().currencyManager().defaultCurrency(), amount, operation);
     }
