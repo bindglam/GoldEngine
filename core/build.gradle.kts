@@ -23,6 +23,7 @@ paperPluginYaml {
     loader = "$group.GoldEnginePluginLoader"
     apiVersion = "1.20"
     author = "Bindglam"
+    foliaSupported = true
     dependencies {
         server(name = "Vault", load = PaperPluginYaml.Load.BEFORE, required = false, joinClasspath = true)
         server(name = "PlaceholderAPI", load = PaperPluginYaml.Load.BEFORE, required = false, joinClasspath = true)
