@@ -33,9 +33,7 @@ object VaultEconomy : AbstractEconomy() {
     override fun getBalance(playerName: String): Double {
         val player = Bukkit.getOfflinePlayer(playerName)
 
-        AccountManagerImpl.getAccount(player.uniqueId).get().use { account ->
-            return account.balance().get().toDouble()
-        }
+        return AccountManagerImpl.getAccount(player.uniqueId).getBalance().get().toDouble()
     }
 
     override fun getBalance(playerName: String, world: String): Double = getBalance(playerName)
@@ -47,12 +45,12 @@ object VaultEconomy : AbstractEconomy() {
     override fun withdrawPlayer(playerName: String, amount: Double): EconomyResponse {
         val player = Bukkit.getOfflinePlayer(playerName)
 
-        AccountManagerImpl.getAccount(player.uniqueId).get().use { account ->
-            return if(account.balance().modify(BigDecimal.valueOf(amount), Operation.WITHDRAW).isSuccess)
-                EconomyResponse(amount, account.balance().get().toDouble(), EconomyResponse.ResponseType.SUCCESS, null)
-            else
-                EconomyResponse(amount, account.balance().get().toDouble(), EconomyResponse.ResponseType.FAILURE, null)
-        }
+        val account = AccountManagerImpl.getAccount(player.uniqueId)
+        val result = account.modifyBalance(BigDecimal.valueOf(amount), Operation.WITHDRAW).get()
+        return if(result.isSuccess)
+            EconomyResponse(amount, result.result().toDouble(), EconomyResponse.ResponseType.SUCCESS, null)
+        else
+            EconomyResponse(amount, result.result().toDouble(), EconomyResponse.ResponseType.FAILURE, null)
     }
 
     override fun withdrawPlayer(playerName: String, worldName: String, amount: Double): EconomyResponse = withdrawPlayer(playerName, amount)
@@ -60,12 +58,12 @@ object VaultEconomy : AbstractEconomy() {
     override fun depositPlayer(playerName: String, amount: Double): EconomyResponse {
         val player = Bukkit.getOfflinePlayer(playerName)
 
-        AccountManagerImpl.getAccount(player.uniqueId).get().use { account ->
-            return if(account.balance().modify(BigDecimal.valueOf(amount), Operation.DEPOSIT).isSuccess)
-                EconomyResponse(amount, account.balance().get().toDouble(), EconomyResponse.ResponseType.SUCCESS, null)
-            else
-                EconomyResponse(amount, account.balance().get().toDouble(), EconomyResponse.ResponseType.FAILURE, null)
-        }
+        val account = AccountManagerImpl.getAccount(player.uniqueId)
+        val result = account.modifyBalance(BigDecimal.valueOf(amount), Operation.DEPOSIT).get()
+        return if(result.isSuccess)
+            EconomyResponse(amount, result.result().toDouble(), EconomyResponse.ResponseType.SUCCESS, null)
+        else
+            EconomyResponse(amount, result.result().toDouble(), EconomyResponse.ResponseType.FAILURE, null)
     }
 
     override fun depositPlayer(playerName: String, worldName: String, amount: Double): EconomyResponse = depositPlayer(playerName, amount)
@@ -97,12 +95,7 @@ object VaultEconomy : AbstractEconomy() {
     override fun getBanks(): List<String> =
         listOf()
 
-    override fun createPlayerAccount(playerName: String): Boolean {
-        val player = Bukkit.getOfflinePlayer(playerName)
-
-        AccountManagerImpl.getAccount(player.uniqueId).get().close()
-        return true
-    }
+    override fun createPlayerAccount(playerName: String): Boolean = true
 
     override fun createPlayerAccount(playerName: String, worldName: String): Boolean = createPlayerAccount(playerName)
 }

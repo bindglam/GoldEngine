@@ -9,11 +9,9 @@ import org.bukkit.event.player.PlayerQuitEvent
 object PlayerJoinQuitListener : Listener {
     @EventHandler
     fun PlayerJoinEvent.onJoin() {
-        AccountManagerImpl.loadOnlineAccount(player)
     }
 
     @EventHandler
     fun PlayerQuitEvent.onJoin() {
-        AccountManagerImpl.disposeOnlineAccount(player)
     }
 }

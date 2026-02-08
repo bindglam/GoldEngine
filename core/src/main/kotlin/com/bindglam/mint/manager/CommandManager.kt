@@ -4,7 +4,6 @@ import com.bindglam.mint.Mint
 import com.bindglam.mint.account.Operation
 import com.bindglam.mint.utils.lang
 import com.bindglam.mint.utils.plugin
-import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.incendo.cloud.SenderMapper
 import org.incendo.cloud.bukkit.CloudBukkitCapabilities
@@ -53,9 +52,9 @@ object CommandManager : Managerial {
                     return@handler
                 }
 
-                AccountManagerImpl.getAccount(target.uniqueId).thenAccept { account ->
-                    ctx.sender().sendMessage(lang("command_money_balance_get", target.name ?: "Unknown", currency.format(account.balance()[currency])))
-                    account.close()
+                val account = AccountManagerImpl.getAccount(target.uniqueId)
+                account.getBalance(currency).thenAccept { balance ->
+                    ctx.sender().sendMessage(lang("command_money_balance_get", target.name ?: "Unknown", currency.format(balance)))
                 }
             })
         manager.command(manager.commandBuilder("mint")
@@ -82,10 +81,9 @@ object CommandManager : Managerial {
                     return@handler
                 }
 
-                AccountManagerImpl.getAccount(target.uniqueId).thenAccept { account ->
-                    account.balance().modify(currency, BigDecimal.valueOf(amount), operation)
-                    ctx.sender().sendMessage(lang("command_money_balance_get", target.name ?: "Unknown", currency.format(account.balance()[currency])))
-                    account.close()
+                val account = AccountManagerImpl.getAccount(target.uniqueId)
+                account.modifyBalance(currency, BigDecimal.valueOf(amount), operation).thenAccept { result ->
+                    ctx.sender().sendMessage(lang("command_money_balance_get", target.name ?: "Unknown", currency.format(result.result())))
                 }
             })
         manager.command(manager.commandBuilder("mint")
@@ -96,14 +94,12 @@ object CommandManager : Managerial {
             .handler { ctx ->
                 val target = Bukkit.getOfflinePlayer(ctx.get<String>("target"))
 
-                AccountManagerImpl.getAccount(target.uniqueId).thenAccept { account ->
-                    account.logger().retrieveLogs(10).thenAccept { logs ->
-                        logs.forEach { log ->
-                            ctx.sender().sendMessage(lang("command_money_balance_logs", log.timestamp(), log.operation(), log.value(), log.result().result(),
-                                if(log.result().isSuccess) "<green>O" else "<red>X"))
-                        }
+                val account = AccountManagerImpl.getAccount(target.uniqueId)
+                account.logger().retrieveLogs(10).thenAccept { logs ->
+                    logs.forEach { log ->
+                        ctx.sender().sendMessage(lang("command_money_balance_logs", log.timestamp(), log.operation(), log.value(), log.result().result(),
+                            if(log.result().isSuccess) "<green>O" else "<red>X"))
                     }
-                    account.close()
                 }
             })
     }

@@ -33,7 +33,7 @@ class GoldEngineTestPlugin : JavaPlugin() {
     }
 
     private fun registerCommands() {
-        CommandAPICommand("돈")
+        /*CommandAPICommand("돈")
             .withSubcommands(
                 CommandAPICommand("보내기")
                     .withArguments(OfflinePlayerArgument("받는플레이어"), DoubleArgument("돈"))
@@ -84,6 +84,6 @@ class GoldEngineTestPlugin : JavaPlugin() {
                     account.close()
                 }
             })
-            .register()
+            .register()*/
     }
 }
