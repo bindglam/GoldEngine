@@ -1,8 +1,8 @@
-# 💴 GoldEngine
+# 💴 Mint
 
-[![CodeFactor](https://www.codefactor.io/repository/github/bindglam/goldengine/badge)](https://www.codefactor.io/repository/github/bindglam/goldengine)
+[![CodeFactor](https://www.codefactor.io/repository/github/bindglam/mint/badge)](https://www.codefactor.io/repository/github/bindglam/mint)
 
-GoldEngine is a plugin that helps you easily add and manage various currency systems on your Minecraft Paper server.
+Mint is a plugin that helps you easily add and manage various currency systems on your Minecraft Paper server.
 
 ## 🚀 Key Features
 
@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.github.bindglam.GoldEngine:api:<VERSION>")
+    compileOnly("com.github.bindglam.Mint:api:<VERSION>")
 }
 ```
 
