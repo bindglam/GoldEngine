@@ -13,7 +13,7 @@ public enum Operation {
     DEPOSIT((a, b) -> Result.success(a.add(b))),
     WITHDRAW((a, b) -> {
         if(a.compareTo(b) < 0)
-            return Result.failure();
+            return Result.failure(a);
 
         return Result.success(a.subtract(b));
     });
@@ -41,8 +41,8 @@ public enum Operation {
             return new Result(true, result);
         }
 
-        public static Result failure() {
-            return new Result(false, null);
+        public static Result failure(BigDecimal result) {
+            return new Result(false, result);
         }
     }
 }

@@ -6,14 +6,14 @@ import com.bindglam.mint.account.log.Log
 import com.bindglam.mint.account.log.TransactionLoggerImpl
 import com.bindglam.mint.currency.Currency
 import java.math.BigDecimal
+import java.sql.Timestamp
+import java.time.Instant
 import java.time.LocalDateTime
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.set
 
-class BalanceImpl : Balance {
+class BalanceImpl(private val logger: TransactionLoggerImpl) : Balance {
     private val map = ConcurrentHashMap<String, BigDecimal>()
-
-    private val logger = TransactionLoggerImpl()
 
     init {
         Mint.instance().currencyManager().registry().entries().forEach { currency ->
@@ -41,12 +41,10 @@ class BalanceImpl : Balance {
 
         if(result.isSuccess) {
             map[currency.id] = result.result
-
-            logger.log(Log(LocalDateTime.now(), operation, result, value))
         }
+
+        logger.log(Log(Timestamp.from(Instant.now()), operation, result, value))
 
         return result
     }
-
-    override fun logger() = logger
 }

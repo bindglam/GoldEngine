@@ -12,8 +12,6 @@ import java.math.BigDecimal;
  * @author bindglam
  */
 public interface Balance {
-    TransactionLogger logger();
-
     /**
      * Get the balance of the account in the given currency
      *

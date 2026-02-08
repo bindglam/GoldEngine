@@ -4,6 +4,7 @@ import com.bindglam.mint.Mint
 import com.bindglam.mint.account.Operation
 import com.bindglam.mint.utils.lang
 import com.bindglam.mint.utils.plugin
+import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.incendo.cloud.SenderMapper
 import org.incendo.cloud.bukkit.CloudBukkitCapabilities
@@ -84,6 +85,24 @@ object CommandManager : Managerial {
                 AccountManagerImpl.getAccount(target.uniqueId).thenAccept { account ->
                     account.balance().modify(currency, BigDecimal.valueOf(amount), operation)
                     ctx.sender().sendMessage(lang("command_money_balance_get", target.name ?: "Unknown", currency.format(account.balance()[currency])))
+                    account.close()
+                }
+            })
+        manager.command(manager.commandBuilder("mint")
+            .permission(Permission.of("mint.command.balance.get"))
+            .literal("balance")
+            .literal("logs")
+            .required("target", StringParser.stringParser(), SuggestionProvider.blocking { _, _ -> Bukkit.getOnlinePlayers().map { Suggestion.suggestion(it.name) } })
+            .handler { ctx ->
+                val target = Bukkit.getOfflinePlayer(ctx.get<String>("target"))
+
+                AccountManagerImpl.getAccount(target.uniqueId).thenAccept { account ->
+                    account.logger().retrieveLogs(10).thenAccept { logs ->
+                        logs.forEach { log ->
+                            ctx.sender().sendMessage(lang("command_money_balance_logs", log.timestamp(), log.operation(), log.value(), log.result().result(),
+                                if(log.result().isSuccess) "<green>O" else "<red>X"))
+                        }
+                    }
                     account.close()
                 }
             })

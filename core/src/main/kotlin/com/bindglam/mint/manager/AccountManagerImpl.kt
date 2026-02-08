@@ -1,10 +1,12 @@
 package com.bindglam.mint.manager
 
+import com.bindglam.mint.account.AbstractAccount
 import com.bindglam.mint.account.Account
 import com.bindglam.mint.account.OfflineAccount
 import com.bindglam.mint.account.OfflineAccountImpl
 import com.bindglam.mint.account.OnlineAccount
 import com.bindglam.mint.account.OnlineAccountImpl
+import com.bindglam.mint.account.log.TransactionLoggerImpl
 import com.bindglam.mint.utils.Constants
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -14,15 +16,14 @@ import java.util.concurrent.ConcurrentHashMap
 
 object AccountManagerImpl : AccountManager {
     const val ACCOUNTS_TABLE_NAME = "${Constants.PLUGIN_ID}_accounts"
+    const val LOGS_TABLE_NAME = "${Constants.PLUGIN_ID}_logs"
 
     private val onlineAccounts = ConcurrentHashMap<UUID, OnlineAccount>()
 
     override fun start(context: Context) {
         context.plugin().database().getConnection { connection ->
-            connection.createStatement().use { statement ->
-                statement.execute("CREATE TABLE IF NOT EXISTS $ACCOUNTS_TABLE_NAME" +
-                        "(holder VARCHAR(36) PRIMARY KEY, balance JSON)")
-            }
+            AbstractAccount.createTable(connection)
+            TransactionLoggerImpl.createTable(connection)
         }
 
         Bukkit.getOnlinePlayers().forEach { loadOnlineAccount(it) }

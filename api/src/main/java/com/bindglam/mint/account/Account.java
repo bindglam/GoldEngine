@@ -1,5 +1,6 @@
 package com.bindglam.mint.account;
 
+import com.bindglam.mint.account.log.TransactionLogger;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -21,4 +22,6 @@ public interface Account extends AutoCloseable {
      * Get the account's balance
      */
     @NotNull Balance balance();
+
+    @NotNull TransactionLogger logger();
 }

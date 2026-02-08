@@ -2,12 +2,24 @@ package com.bindglam.mint.account
 
 import com.alibaba.fastjson2.JSON
 import com.bindglam.mint.Mint
-import com.bindglam.mint.manager.AccountManager
+import com.bindglam.mint.account.log.TransactionLoggerImpl
 import com.bindglam.mint.manager.AccountManagerImpl
+import java.sql.Connection
 import java.util.*
 
 abstract class AbstractAccount(private val holder: UUID) : Account {
-    private val balance = BalanceImpl()
+    companion object {
+        fun createTable(connection: Connection) {
+            connection.createStatement().use { statement ->
+                statement.execute("CREATE TABLE IF NOT EXISTS ${AccountManagerImpl.ACCOUNTS_TABLE_NAME}" +
+                        "(holder VARCHAR(36) PRIMARY KEY, balance JSON)")
+            }
+        }
+    }
+
+    private val logger = TransactionLoggerImpl(this)
+
+    private val balance = BalanceImpl(logger)
 
     private var isJustCreated = false
 
@@ -62,4 +74,5 @@ abstract class AbstractAccount(private val holder: UUID) : Account {
 
     override fun holder() = holder
     override fun balance() = balance
+    override fun logger() = logger
 }
