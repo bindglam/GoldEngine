@@ -19,8 +19,8 @@ dependencies {
 paperPluginYaml {
     name = rootProject.name
     version = rootProject.version.toString()
-    main = "$group.GoldEnginePluginImpl"
-    loader = "$group.GoldEnginePluginLoader"
+    main = "$group.MintPluginImpl"
+    loader = "$group.MintPluginLoader"
     apiVersion = "1.20"
     author = "Bindglam"
     foliaSupported = true
