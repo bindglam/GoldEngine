@@ -1,7 +1,6 @@
 package com.bindglam.mint
 
 import com.bindglam.mint.database.Database
-import com.bindglam.mint.listeners.PlayerJoinQuitListener
 import com.bindglam.mint.manager.AccountManagerImpl
 import com.bindglam.mint.manager.CommandManager
 import com.bindglam.mint.manager.CompatibilityManager
@@ -39,8 +38,6 @@ class MintPluginImpl : JavaPlugin(), MintPlugin {
         this.config.load()
 
         Mint.registerInstance(this)
-
-        this.server.pluginManager.registerEvents(PlayerJoinQuitListener, this)
 
         this.database = this.config.database.type.value().create(this.config)
         this.database.start()
